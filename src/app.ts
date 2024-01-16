@@ -4,7 +4,7 @@ import express, { Express } from "express";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import userRoute from "./routes/user";
-import studentPostRoute from "./routes/student_post";
+import postRoute from "./routes/post";
 import authRoute from "./routes/auth";
 
 const initApp = (): Promise<Express> => {
@@ -18,7 +18,7 @@ const initApp = (): Promise<Express> => {
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use("/user", userRoute);
-      app.use("/studentpost", studentPostRoute);
+      app.use("/post", postRoute);
       app.use("/auth", authRoute);
       resolve(app);
     });
