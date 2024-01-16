@@ -2,12 +2,14 @@ import request from "supertest";
 import initApp from "../app";
 import mongoose from "mongoose";
 import { Express } from "express";
-import User from "../models/user_model";
+import User from "../models/user";
 
 let app: Express;
 const user = {
   email: "testUser@test.com",
   password: "1234567890",
+  firstName: "Geri",
+  lastName: "Guerrero"
 }
 
 beforeAll(async () => {
@@ -79,7 +81,6 @@ describe("Auth tests", () => {
 
   test("Test access after timeout of token", async () => {
     await new Promise(resolve => setTimeout(() => resolve("done"), 5000));
-
     const response = await request(app)
       .get("/student")
       .set("Authorization", "JWT " + accessToken);

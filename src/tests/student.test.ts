@@ -1,9 +1,9 @@
 import request from "supertest";
 import initApp from "../app";
 import mongoose from "mongoose";
-import Student from "../models/student_model";
+import Student from "../models/student";
 import { Express } from "express";
-import User from "../models/user_model";
+import User from "../models/user";
 
 let app: Express;
 let accessToken: string;

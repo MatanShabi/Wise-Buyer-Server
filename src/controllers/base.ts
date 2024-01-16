@@ -44,12 +44,36 @@ export class BaseController<ModelType>{
         }
     }
 
-    putById(req: Request, res: Response) {
+    async putById(req: Request, res: Response) {
         res.send("put student by id: " + req.params.id);
+        try {
+            const updatedStudent = await this.model.findByIdAndUpdate(
+                req.params.id,
+                req.body,
+                { new: true } // This option returns the updated document
+            );
+            if (!updatedStudent) {
+                res.status(404).json({ message: 'No item found with this ID' });
+            } else {
+                res.status(200).json(updatedStudent);
+            }
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
     }
 
-    deleteById(req: Request, res: Response) {
-        res.send("delete student by id: " + req.params.id);
+    async deleteById(req: Request, res: Response) {
+        console.log("deleteById:" + req.params.id);
+        try {
+            const result = await this.model.deleteOne({ _id: req.params.id });
+            if (result.deletedCount === 0) {
+                res.status(404).json({ message: 'No item found with this ID' });
+            } else {
+                res.status(200).json({ message: 'Item deleted successfully' });
+            }
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
     }
 }
 
