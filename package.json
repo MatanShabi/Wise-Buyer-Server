@@ -1,5 +1,5 @@
 {
-  "name": "sa_2023b",
+  "name": "Wise-Buyer-Server",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -11,7 +11,7 @@
     "dev": "nodemon ./src/server.ts",
     "prod": "cp .envprod .env && tsc -p tsconfig_prod.json && pm2 restart ecosystem.config.js --env production"
   },
-  "author": "Eliav Menachi",
+  "author": "Raz Hagay Gavriel + Matan Shabi",
   "license": "ISC",
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
