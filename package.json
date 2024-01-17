@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "tsc && jest --detectOpenHandles --forceExit",
+    "test": "tsc && jest --detectOpenHandles --coverage --forceExit",
     "testAuth": "tsc && jest --detectOpenHandles --forceExit ./src/tests/auth.test.ts",
     "testPost": "tsc && jest --detectOpenHandles --forceExit --runInBand ./src/tests/post.test.ts",
     "testUser": "tsc && jest --detectOpenHandles --forceExit --runInBand ./src/tests/user.test.ts",

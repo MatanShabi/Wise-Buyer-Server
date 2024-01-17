@@ -26,12 +26,6 @@ afterAll(async () => {
 });
 
 describe("User tests", () => {
-  // const addUser = async (user: IUser) => {
-  //   const response = await request(app).post("/user")
-  //     .set("Authorization", "JWT " + accessToken)
-  //     .send(user);
-  //   expect(response.statusCode).toBe(201);
-
   test("Test add first user", async () => {
     await request(app)
       .post("/auth/register")
