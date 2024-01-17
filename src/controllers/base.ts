@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { Model } from "mongoose";
+import { AuthResquest } from "../common/auth_middleware";
 
 export class BaseController<ModelType>{
 
@@ -9,14 +10,14 @@ export class BaseController<ModelType>{
     }
 
     async get(req: Request, res: Response) {
-        console.log("getAllStudents");
+
         try {
-            if (req.query.name) {
-                const students = await this.model.find({ name: req.query.name });
-                res.send(students);
+            if (req.query._id) {
+                const users = await this.model.find({ _id: req.query._id });
+                res.send(users);
             } else {
-                const students = await this.model.find();
-                res.send(students);
+                const users = await this.model.find();
+                res.send(users);
             }
         } catch (err) {
             res.status(500).json({ message: err.message });
@@ -26,8 +27,8 @@ export class BaseController<ModelType>{
     async getById(req: Request, res: Response) {
         console.log("getStudentById:" + req.params.id);
         try {
-            const student = await this.model.findById(req.params.id);
-            res.send(student);
+            const user = await this.model.findById(req.params.id);
+            res.send(user);
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
@@ -44,28 +45,28 @@ export class BaseController<ModelType>{
         }
     }
 
-    async putById(req: Request, res: Response) {
-        res.send("put student by id: " + req.params.id);
+    async putById(req: AuthResquest, res: Response) {
+        const userId = req.user._id;
         try {
-            const updatedStudent = await this.model.findByIdAndUpdate(
-                req.params.id,
+            const updatedUser = await this.model.findByIdAndUpdate(
+                userId,
                 req.body,
                 { new: true } // This option returns the updated document
             );
-            if (!updatedStudent) {
+            if (!updatedUser) {
                 res.status(404).json({ message: 'No item found with this ID' });
             } else {
-                res.status(200).json(updatedStudent);
+                res.status(200).json(updatedUser);
             }
         } catch (err) {
             res.status(500).json({ message: err.message });
         }
     }
 
-    async deleteById(req: Request, res: Response) {
-        console.log("deleteById:" + req.params.id);
+    async deleteById(req: AuthResquest, res: Response) {
+        const userId = req.user._id;
         try {
-            const result = await this.model.deleteOne({ _id: req.params.id });
+            const result = await this.model.deleteOne({ _id: userId });
             if (result.deletedCount === 0) {
                 res.status(404).json({ message: 'No item found with this ID' });
             } else {
