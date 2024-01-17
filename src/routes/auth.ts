@@ -120,6 +120,48 @@ router.post("/login", authController.login);
 *         description: logout completed successfully
 */
 router.get("/logout", authController.logout);
+
+
+/**
+* @swagger
+* /auth/refresh:
+*   post:
+*     summary: Refresh Access Token
+*     tags: [Auth]
+*     description: Refresh the access token using a valid refresh token.
+*     security:
+*       - bearerAuth: []
+*     parameters:
+*       - in: header
+*         name: Authorization
+*         required: true
+*         schema:
+*           type: string
+*         description: Bearer token in the format "Bearer <refreshToken>"
+*     responses:
+*       200:
+*         description: Successfully refreshed access token
+*         content:
+*           application/json:
+*             example:
+*               accessToken: <newAccessToken>
+*               refreshToken: <newRefreshToken>
+*       401:
+*         description: Unauthorized
+*         content:
+*           application/json:
+*             example:
+*               message: Unauthorized
+*               details: <Error details, if available>
+*       500:
+*         description: Internal Server Error
+*         content:
+*           application/json:
+*             example:
+*               message: Internal Server Error
+*               details: <Error details, if available>
+*/
+
 router.get("/refresh", authController.refresh);
 
 export default router;
