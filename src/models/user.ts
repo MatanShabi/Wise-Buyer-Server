@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, {ObjectId} from "mongoose";
 
 export interface IUser {
   email: string;
@@ -7,6 +7,7 @@ export interface IUser {
   firstName: string;
   lastName: string;
   refreshTokens?: string[];
+  favorites?: ObjectId[];
 }
 
 const userSchema = new mongoose.Schema<IUser>({
@@ -30,6 +31,10 @@ const userSchema = new mongoose.Schema<IUser>({
     type: [String],
     required: false,
   },
+  favorites: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Post'
+  }],
 });
 
 export default mongoose.model<IUser>("User", userSchema);
