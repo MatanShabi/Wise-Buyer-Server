@@ -1,16 +1,16 @@
 import express from "express";
 const router = express.Router();
-import studentPostController from "../controllers/post";
+import PostController from "../controllers/post";
 import authMiddleware from "../common/auth_middleware";
 
-router.get("/", studentPostController.get.bind(studentPostController));
+router.get("/", PostController.get.bind(PostController));
 
-router.get("/:id", studentPostController.getById.bind(studentPostController));
+router.get("/:id", PostController.getById.bind(PostController));
 
-router.post("/", authMiddleware, studentPostController.post.bind(studentPostController));
+router.post("/", authMiddleware, PostController.post.bind(PostController));
 
-router.put("/:id", authMiddleware, studentPostController.putById.bind(studentPostController));
+router.put("/:id", authMiddleware, PostController.putById.bind(PostController));
 
-router.delete("/:id", authMiddleware, studentPostController.deleteById.bind(studentPostController));
+router.delete("/:id", authMiddleware, PostController.deleteById.bind(PostController));
 
 export default router;

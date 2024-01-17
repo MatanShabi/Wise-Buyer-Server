@@ -1,9 +1,12 @@
-import mongoose from "mongoose";
+import mongoose, {ObjectId} from "mongoose";
 
 export interface IPost {
   title: string;
-  message: string;
-  owner: string;
+  catalog: string;
+  description: string;
+  link?: string;
+  price: number;
+  owner?: ObjectId;
 }
 
 const postSchema = new mongoose.Schema<IPost>({
@@ -11,14 +14,27 @@ const postSchema = new mongoose.Schema<IPost>({
     type: String,
     required: true,
   },
-  message: {
+  catalog: {
     type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  link: {
+    type: String,
+    required: false,
+  },
+  price: {
+    type: Number,
     required: true,
   },
   owner: {
-    type: String,
-    required: true,
-  },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', 
+    required: false,
+  }
 });
 
 export default mongoose.model<IPost>("Post", postSchema);

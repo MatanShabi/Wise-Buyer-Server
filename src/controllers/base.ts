@@ -25,7 +25,7 @@ export class BaseController<ModelType>{
     }
 
     async getById(req: Request, res: Response) {
-        console.log("getStudentById:" + req.params.id);
+        console.log("getUserById:" + req.params.id);
         try {
             const user = await this.model.findById(req.params.id);
             res.send(user);
@@ -35,7 +35,7 @@ export class BaseController<ModelType>{
     }
 
     async post(req: Request, res: Response) {
-        console.log("postStudent:" + req.body);
+        console.log("post:" + req.body);
         try {
             const obj = await this.model.create(req.body);
             res.status(201).send(obj);
