@@ -10,7 +10,7 @@ const register = async (req: Request, res: Response) => {
     const password = req.body.password;
 
     if (!email || !password || !firstName || !lastName) {
-        return res.status(400).send("missing email or password");
+        return res.status(400).send("missing parameters in body request");
     }
     try {
         const rs = await User.findOne({ 'email': email });

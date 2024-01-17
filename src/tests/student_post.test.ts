@@ -2,20 +2,22 @@ import { Express } from "express";
 import request from "supertest";
 import initApp from "../app";
 import mongoose from "mongoose";
-import StudentPost, { IStudentPost } from "../models/post";
+import Post, { IPost } from "../models/post";
 import User, { IUser } from "../models/user";
 
 let app: Express;
 const user: IUser = {
   email: "test@student.post.test",
   password: "1234567890",
+  firstName: "Geri",
+  lastName: "Guerrero"
 }
 let accessToken = "";
 
 beforeAll(async () => {
   app = await initApp();
   console.log("beforeAll");
-  await StudentPost.deleteMany();
+  await Post.deleteMany();
 
   await User.deleteMany({ 'email': user.email });
   const response = await request(app).post("/auth/register").send(user);
@@ -28,16 +30,16 @@ afterAll(async () => {
   await mongoose.connection.close();
 });
 
-const post1: IStudentPost = {
+const post1: IPost = {
   title: "title1",
   message: "message1",
   owner: "1234567890",
 };
 
 describe("Student post tests", () => {
-  const addStudentPost = async (post: IStudentPost) => {
+  const addPost = async (post: IPost) => {
     const response = await request(app)
-      .post("/studentpost")
+      .post("/post")
       .set("Authorization", "JWT " + accessToken)
       .send(post);
     expect(response.statusCode).toBe(201);
@@ -47,17 +49,17 @@ describe("Student post tests", () => {
   };
 
   test("Test Get All Student posts - empty response", async () => {
-    const response = await request(app).get("/studentpost");
+    const response = await request(app).get("/post");
     expect(response.statusCode).toBe(200);
     expect(response.body).toStrictEqual([]);
   });
 
   test("Test Post Student post", async () => {
-    addStudentPost(post1);
+    addPost(post1);
   });
 
   test("Test Get All Students posts with one post in DB", async () => {
-    const response = await request(app).get("/studentpost");
+    const response = await request(app).get("/post");
     expect(response.statusCode).toBe(200);
     const rc = response.body[0];
     expect(rc.title).toBe(post1.title);

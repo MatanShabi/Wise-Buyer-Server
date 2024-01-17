@@ -27,6 +27,7 @@ let refreshToken: string;
 let newRefreshToken: string
 
 describe("Auth tests", () => {
+
   test("Test Register", async () => {
     const response = await request(app)
       .post("/auth/register")
@@ -41,10 +42,11 @@ describe("Auth tests", () => {
     expect(response.statusCode).toBe(406);
   });
 
-  test("Test Register missing password", async () => {
+  test("Test Register missing parameters in body request ", async () => {
     const response = await request(app)
       .post("/auth/register").send({
         email: "test@test.com",
+        password: "1234567890",
       });
     expect(response.statusCode).toBe(400);
   });
@@ -55,24 +57,26 @@ describe("Auth tests", () => {
     expect(response.statusCode).toBe(200);
     accessToken = response.body.accessToken;
     refreshToken = response.body.refreshToken;
+    console.log("accessToken: " + accessToken);
+    console.log("refreshToken: " + refreshToken);
     expect(accessToken).toBeDefined();
   });
 
   test("Test forbidden access without token", async () => {
-    const response = await request(app).get("/student");
+    const response = await request(app).get("/user");
     expect(response.statusCode).toBe(401);
   });
 
   test("Test access with valid token", async () => {
     const response = await request(app)
-      .get("/student")
+      .get("/user")
       .set("Authorization", "JWT " + accessToken);
     expect(response.statusCode).toBe(200);
   });
 
   test("Test access with invalid token", async () => {
     const response = await request(app)
-      .get("/student")
+      .get("/user")
       .set("Authorization", "JWT 1" + accessToken);
     expect(response.statusCode).toBe(401);
   });
@@ -82,7 +86,7 @@ describe("Auth tests", () => {
   test("Test access after timeout of token", async () => {
     await new Promise(resolve => setTimeout(() => resolve("done"), 5000));
     const response = await request(app)
-      .get("/student")
+      .get("/user")
       .set("Authorization", "JWT " + accessToken);
     expect(response.statusCode).not.toBe(200);
   });
@@ -100,7 +104,7 @@ describe("Auth tests", () => {
     newRefreshToken = response.body.refreshToken;
 
     const response2 = await request(app)
-      .get("/student")
+      .get("/user")
       .set("Authorization", "JWT " + newAccessToken);
     expect(response2.statusCode).toBe(200);
   });
