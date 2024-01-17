@@ -6,7 +6,7 @@ import User from "../models/user";
 
 let app: Express;
 const user = {
-  email: "testUser@test.com",
+  email: "testUserAuth@test.com",
   password: "1234567890",
   firstName: "Geri",
   lastName: "Guerrero"

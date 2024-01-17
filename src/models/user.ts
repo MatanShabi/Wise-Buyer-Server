@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 export interface IUser {
   email: string;
+  _id?: string;
   password: string;
   firstName: string;
   lastName: string;
-  _id?: string;
   refreshTokens?: string[];
 }
 
