@@ -1,11 +1,12 @@
 ###
 
 GET http://localhost:3000/user
+Authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWE4NDYzYTdlNDFlMDhiODU5ODAzZDAiLCJpYXQiOjE3MDU1MjY4NjAsImV4cCI6MTcwNTUzMDQ2MH0.1_CpSg1UhiR_dL5TrsWOXszC640QBlzl_LbSG7xbocw
 
 ###
 
 GET http://localhost:3000/user?name=John%20Doe
-
+Authorization: JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWE4NDYzYTdlNDFlMDhiODU5ODAzZDAiLCJpYXQiOjE3MDU1MjY4NjAsImV4cCI6MTcwNTUzMDQ2MH0.1_CpSg1UhiR_dL5TrsWOXszC640QBlzl_LbSG7xbocw
 
 ###
 
@@ -18,7 +19,7 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-    "email": "testUser@test.com",
+    "email": "test1@test.com",
     "password": "1234567890"
 }
 ###

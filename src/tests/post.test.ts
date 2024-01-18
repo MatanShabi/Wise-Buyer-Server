@@ -7,6 +7,7 @@ import User, { IUser } from "../models/user";
 
 let app: Express;
 let accessToken = "";
+let user_id = "";
 
 const user: IUser = {
   email: "test@post.test",
@@ -27,9 +28,14 @@ beforeAll(async () => {
   await Post.deleteMany();
 
   await User.deleteMany({ 'email': user.email });
-  const response = await request(app).post("/auth/register").send(user);
-  user._id = response.body._id;
-  const response2 = await request(app).post("/auth/login").send(user);
+  const response = await request(app)
+    .post("/auth/register")
+    .send(user);
+  
+  user_id = response.body._id;
+  const response2 = await request(app)
+    .post("/auth/login")
+    .send(user);
   accessToken = response2.body.accessToken;
 });
 
@@ -42,9 +48,9 @@ describe("post tests", () => {
     const response = await request(app)
       .post("/post")
       .set("Authorization", "JWT " + accessToken)
-      .send(post);
+      .send(post1);
     expect(response.statusCode).toBe(201);
-    expect(response.body.owner).toBe(user._id);
+    expect(response.body.owner).toBe(user_id);
     expect(response.body.title).toBe(post.title);
     expect(response.body.description).toBe(post.description);
   };
@@ -63,9 +69,10 @@ describe("post tests", () => {
     const response = await request(app).get("/post");
     expect(response.statusCode).toBe(200);
     const rc = response.body[0];
+    console.log(rc);
     expect(rc.title).toBe(post1.title);
     expect(rc.description).toBe(post1.description);
-    expect(rc.owner).toBe(user._id);
+    expect(rc.owner).toBe(user_id);
   });
 
 });
