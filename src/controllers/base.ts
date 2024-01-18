@@ -64,10 +64,16 @@ export class BaseController<ModelType>{
     }
 
     async deleteById(req: AuthResquest, res: Response) {
-        const userId = req.user._id;
+        const userId = req.user._id
+        let result = null;
         try {
-            const result = await this.model.deleteOne({ _id: userId });
-            if (result.deletedCount === 0) {
+            if (req.params.idToDelete){
+               result = await this.model.deleteOne({ _id: req.params.idToDelete });     
+            }
+            else{
+               result = await this.model.deleteOne({ _id: userId });
+            }
+            if (!result || result.deletedCount === 0) {
                 res.status(404).json({ message: 'No item found with this ID' });
             } else {
                 res.status(200).json({ message: 'Item deleted successfully' });
