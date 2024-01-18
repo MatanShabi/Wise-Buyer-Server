@@ -1,11 +1,11 @@
-import Post, { IPost } from "../models/post";
+import PostModel, { IPost } from "../models/post";
 import { BaseController } from "./base";
 import { Response } from "express";
 import { AuthResquest } from "../common/auth_middleware";
 
 class PostController extends BaseController<IPost>{
     constructor() {
-        super(Post)
+        super(PostModel)
     }
 
     async post(req: AuthResquest, res: Response) {
