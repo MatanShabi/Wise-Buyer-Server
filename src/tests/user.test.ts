@@ -18,7 +18,6 @@ beforeAll(async () => {
   app = await initApp();
   console.log("beforeAll");
   await User.deleteMany();
-  // User.deleteMany({ 'email': user.email });
 });
 
 afterAll(async () => {

@@ -6,7 +6,6 @@ import bodyParser from "body-parser";
 import userRoute from "./routes/user";
 import postRoute from "./routes/post";
 import authRoute from "./routes/auth";
-import likeRoute from "./routes/like";
 
 const initApp = (): Promise<Express> => {
   const promise = new Promise<Express>((resolve) => {
@@ -21,7 +20,6 @@ const initApp = (): Promise<Express> => {
       app.use("/user", userRoute);
       app.use("/post", postRoute);
       app.use("/auth", authRoute);
-      app.use("/like", likeRoute);
       resolve(app);
     });
   });

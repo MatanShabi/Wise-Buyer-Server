@@ -1,85 +1,31 @@
-import express from "express";
+import express from 'express';
+import {
+  getAllPosts,
+  getPostById,
+  createPost,
+  updatePost,
+  deletePost,
+} from '../controllers/post';
+import authMiddleware from '../common/auth_middleware';
+
 const router = express.Router();
-import PostController from "../controllers/post";
-import authMiddleware from "../common/auth_middleware";
-/**
-* @swagger
-* tags:
-*   name: Posts
-*   description: The Posts API
-*/
-
-
-/**
-* @swagger
-* components:
-*   securitySchemes:
-*     bearerAuth:
-*       type: http
-*       scheme: bearer
-*       bearerFormat: JWT
-*/
-
-/**
- * @swagger
- * components:
- *   schemas:
- *     Post:
- *       type: object
- *       required:
- *         - title
- *         - catalog
- *         - description
- *         - price
- *       properties:
- *         title:
- *           type: string
- *           description: The title of the post
- *         catalog:
- *           type: string
- *           description: The catalog of the post
- *         description:
- *           type: string
- *           description: The description of the post
- *         price:
- *           type: number
- *           description: The price of the post
- *       example:
- *         title: Post Title
- *         catalog: Post Catalog
- *         description: Post Description
- *         price: 100
- */
 
 /**
  * @swagger
  * /posts:
  *   get:
  *     summary: Get all posts
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Success
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Post'
- *
+ *         description: Returns the list of posts
  */
-router.get("/", PostController.get.bind(PostController));
+router.get('/', authMiddleware, getAllPosts);
 
 /**
  * @swagger
  * /posts/{id}:
  *   get:
- *     summary: Get post by ID
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
+ *     summary: Get a post by ID
  *     parameters:
  *       - in: path
  *         name: id
@@ -88,48 +34,36 @@ router.get("/", PostController.get.bind(PostController));
  *           type: string
  *     responses:
  *       200:
- *         description: Success
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Post'
- *
+ *         description: Returns the post with the specified ID
+ *       404:
+ *         description: Post not found
  */
-router.get("/:id", PostController.getById.bind(PostController));
+router.get('/:id', authMiddleware, getPostById);
 
 /**
  * @swagger
  * /posts:
  *   post:
  *     summary: Create a new post
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Post'
+ *             $ref: '#/components/schemas/IPost'
  *     responses:
  *       201:
- *         description: Post created
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Post'
- *
+ *         description: Returns the created post
+ *       500:
+ *         description: Internal Server Error
  */
-router.post("/", authMiddleware, PostController.post.bind(PostController));
+router.post('/', authMiddleware, createPost);
 
 /**
  * @swagger
  * /posts/{id}:
  *   put:
  *     summary: Update a post by ID
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -141,26 +75,22 @@ router.post("/", authMiddleware, PostController.post.bind(PostController));
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Post'
+ *             $ref: '#/components/schemas/IPost'
  *     responses:
  *       200:
- *         description: Post updated
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Post'
- *
+ *         description: Returns the updated post
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Internal Server Error
  */
-router.put("/:id", authMiddleware, PostController.putById.bind(PostController));
+router.put('/:id', authMiddleware, updatePost);
 
 /**
  * @swagger
  * /posts/{id}:
  *   delete:
  *     summary: Delete a post by ID
- *     tags: [Posts]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -169,9 +99,12 @@ router.put("/:id", authMiddleware, PostController.putById.bind(PostController));
  *           type: string
  *     responses:
  *       200:
- *         description: Post deleted
- *
+ *         description: Returns the deleted post
+ *       404:
+ *         description: Post not found
+ *       500:
+ *         description: Internal Server Error
  */
-router.delete("/:id", authMiddleware, PostController.deleteById.bind(PostController));
+router.delete('/:id',authMiddleware, deletePost);
 
 export default router;
