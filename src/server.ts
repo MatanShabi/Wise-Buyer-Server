@@ -14,7 +14,7 @@ initApp().then((app) => {
         version: "1.0.1",
         description: "REST server including authentication using JWT and refresh token",
       },
-      servers: [{ url: "http://localhost:3000", },],
+      servers: [{ url: `http://localhost:${process.env.HTTPS_PORT}`, },],
     },
     apis: ["./src/routes/*.ts"],
   };
@@ -22,14 +22,16 @@ initApp().then((app) => {
   app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
   if (process.env.NODE_ENV !== 'production') {
-    console.log('development');
-    http.createServer(app).listen(process.env.PORT);
+    http.createServer(app).listen(process.env.PORT, () => {
+      console.log(`Server running in development mode on https://localhost:${process.env.HTTPS_PORT}`);
+    });
   } else {
-    console.log('PRODUCTION');
     const options2 = {
       key: fs.readFileSync('../client-key.pem'),
       cert: fs.readFileSync('../client-cert.pem')
     };
-    https.createServer(options2, app).listen(process.env.HTTPS_PORT);
+    https.createServer(options2, app).listen(process.env.HTTPS_PORT, () => {
+      console.log(`Server running in production mode on https://localhost:${process.env.HTTPS_PORT}`);
+    });
   }
 });
