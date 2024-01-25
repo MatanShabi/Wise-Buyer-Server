@@ -4,10 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 const register = async (req: Request, res: Response) => {
-    const firstName = req.body.firstName;
-    const lastName = req.body.lastName;
-    const email = req.body.email;
-    const password = req.body.password;
+    const {firstName, lastName, email, password} = req.body;
 
     if (!email || !password || !firstName || !lastName) {
         return res.status(400).send("missing parameters in body request");
@@ -28,8 +25,8 @@ const register = async (req: Request, res: Response) => {
 }
 
 const login = async (req: Request, res: Response) => {
-    const email = req.body.email;
-    const password = req.body.password;
+    const {email, password} = req.body;
+    
     if (!email || !password) {
         return res.status(400).send("missing email or password");
     }
@@ -52,6 +49,10 @@ const login = async (req: Request, res: Response) => {
         }
         await user.save();
         return res.status(200).send({
+            _id: user._id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
             'accessToken': accessToken,
             'refreshToken': refreshToken
         });

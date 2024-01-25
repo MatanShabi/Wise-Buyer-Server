@@ -1,125 +1,56 @@
-import express from "express";
+import express from 'express';
+import {
+  createUser,
+  getUserById,
+  updateUser,
+  deleteUser,
+} from '../controllers/user';
+
 const router = express.Router();
-import userController from "../controllers/user";
-import authMiddleware from "../common/auth_middleware";
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     User:
- *       type: object
- *       required:
- *         - firstName
- *         - lastName
- *         - email
- *         - password
- *       properties:
- *         firstName:
- *           type: string
- *           description: The first name of the user
- *         lastName:
- *           type: string
- *           description: The last name of the user
- *         email:
- *           type: string
- *           description: The email of the user
- *         password:
- *           type: string
- *           description: The password of the user
- *       example:
- *         firstName: John
- *         lastName: Doe
- *         email: john.doe@example.com
- *         password: password123
- */
-
-/**
- * @swagger
- * tags:
- *   name: Users
- *   description: The users managing API
- */
-
-/**
- * @swagger
- * /users:
- *   get:
- *     summary: Get all users
- *     tags: [Users]
- *     security:
- *       - bearerAuth: [] 
- *     responses:
- *       200:
- *         description: Success
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
- *
- */
-router.get("/", authMiddleware, userController.get.bind(userController));
-
-/**
- * @swagger
- * /users/{id}:
- *   get:
- *     summary: Get user by ID
- *     tags: [Users]
- *     security:
- *       - bearerAuth: [] 
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Success
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *
- */
-router.get("/:id", authMiddleware, userController.getById.bind(userController));
-
-/**
- * @swagger
- * /users:
+ * /:
  *   post:
  *     summary: Create a new user
- *     tags: [Users]
- *     security:
- *       - bearerAuth: [] 
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             $ref: '#/components/schemas/IUser'
  *     responses:
  *       201:
- *         description: User created
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *
+ *         description: Returns the created user
+ *       500:
+ *         description: Internal Server Error
  */
-router.post("/", authMiddleware, userController.post.bind(userController));
+router.post('/', createUser);
 
 /**
  * @swagger
- * /users/{id}:
+ * /{id}:
+ *   get:
+ *     summary: Get a user by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Returns the user with the specified ID
+ *       404:
+ *         description: User not found
+ */
+router.get('/:id', getUserById);
+
+/**
+ * @swagger
+ * /{id}:
  *   put:
  *     summary: Update a user by ID
- *     tags: [Users]
- *     security:
- *       - bearerAuth: [] 
  *     parameters:
  *       - in: path
  *         name: id
@@ -131,26 +62,22 @@ router.post("/", authMiddleware, userController.post.bind(userController));
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/User'
+ *             $ref: '#/components/schemas/IUser'
  *     responses:
  *       200:
- *         description: User updated
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *
+ *         description: Returns the updated user
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal Server Error
  */
-router.put("/:id", authMiddleware, userController.putById.bind(userController));
+router.put('/:id', updateUser);
 
 /**
  * @swagger
  * /users/{id}:
  *   delete:
  *     summary: Delete a user by ID
- *     tags: [Users]
- *     security:
- *       - bearerAuth: [] 
  *     parameters:
  *       - in: path
  *         name: id
@@ -159,9 +86,12 @@ router.put("/:id", authMiddleware, userController.putById.bind(userController));
  *           type: string
  *     responses:
  *       200:
- *         description: User deleted
- *
+ *         description: Returns the deleted user
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal Server Error
  */
-router.delete("/:id", authMiddleware, userController.deleteById.bind(userController));
+router.delete('/:id', deleteUser);
 
 export default router;

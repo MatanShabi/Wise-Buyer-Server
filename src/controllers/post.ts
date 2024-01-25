@@ -1,19 +1,58 @@
-import PostModel, { IPost } from "../models/post";
-import { BaseController } from "./base";
-import { Response } from "express";
-import { AuthResquest } from "../common/auth_middleware";
+import { Request, Response } from 'express';
+import PostModel, { IPost } from '../models/post';
 
-class PostController extends BaseController<IPost>{
-    constructor() {
-        super(PostModel)
+export const getAllPosts = async (req: Request, res: Response) => {
+  try {
+    const posts = await PostModel.find();
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const getPostById = async (req: Request, res: Response) => {
+  try {
+    const post = await PostModel.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
     }
+    res.json(post);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
-    async post(req: AuthResquest, res: Response) {
-        console.log("post:" + req.body);
-        const _id = req.user._id;
-        req.body.owner = _id;
-        super.post(req, res);
+export const createPost = async (req: Request, res: Response) => {
+  try {
+    const newPost: IPost = req.body;
+    const createdPost = await PostModel.create(newPost);
+    res.status(201).json(createdPost);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+export const updatePost = async (req: Request, res: Response) => {
+  try {
+    const updatedPost: IPost = req.body;
+    const post = await PostModel.findByIdAndUpdate(req.params.id, updatedPost, { new: true });
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
     }
-}
+    res.json(post);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
-export default new PostController();
+export const deletePost = async (req: Request, res: Response) => {
+  try {
+    const deletedPost = await PostModel.findByIdAndDelete(req.params.id);
+    if (!deletedPost) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    res.json(deletedPost);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
