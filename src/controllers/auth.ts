@@ -49,6 +49,7 @@ const login = async (req: Request, res: Response) => {
         }
         await user.save();
         return res.status(200).send({
+            ...user,
             'accessToken': accessToken,
             'refreshToken': refreshToken
         });
