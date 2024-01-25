@@ -23,7 +23,7 @@ initApp().then((app) => {
 
   if (process.env.NODE_ENV !== 'production') {
     http.createServer(app).listen(process.env.PORT, () => {
-      console.log(`Server running in development mode on http://localhost:${process.env.HTTPS_PORT}`);
+      console.log(`Server running in development mode on http://localhost:${process.env.PORT}`);
     });
   } else {
     const options2 = {
