@@ -4,6 +4,7 @@ import http from 'http';
 import fs from 'fs';
 import swaggerUI from "swagger-ui-express"
 import swaggerJsDoc from "swagger-jsdoc"
+import cors from 'cors'
 
 initApp().then((app) => {
   const options = {
@@ -21,9 +22,12 @@ initApp().then((app) => {
   const specs = swaggerJsDoc(options);
   app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
+  //TODO: when app is ready to production allow just the relevant domains.
+  app.use(cors('*'))
+
   if (process.env.NODE_ENV !== 'production') {
     http.createServer(app).listen(process.env.PORT, () => {
-      console.log(`Server running in development mode on https://localhost:${process.env.HTTPS_PORT}`);
+      console.log(`Server running in development mode on http://localhost:${process.env.HTTPS_PORT}`);
     });
   } else {
     const options2 = {
