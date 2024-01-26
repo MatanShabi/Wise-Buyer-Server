@@ -3,7 +3,10 @@ import PostModel, { IPost } from '../models/post';
 
 export const getAllPosts = async (req: Request, res: Response) => {
   try {
-    const posts = await PostModel.find();
+    const posts = await PostModel.find().populate({
+      path: 'user',
+      select: '_id firstName lastName pictureUrl'
+    });
     res.json(posts);
   } catch (error) {
     res.status(500).json({ message: 'Internal Server Error' });
@@ -26,7 +29,12 @@ export const createPost = async (req: Request, res: Response) => {
   try {
     const newPost: IPost = req.body;
     const createdPost = await PostModel.create(newPost);
-    res.status(201).json(createdPost);
+    const populatedPost = await PostModel.findById(createdPost._id).populate({
+      path: 'user',
+      select: '_id firstName lastName pictureUrl'
+    });
+
+    res.status(201).json(populatedPost);
   } catch (error) {
     res.status(500).json({ message: 'Internal Server Error' });
   }

@@ -5,6 +5,7 @@ import {
     updateUser,
     deleteUser,
 } from '../controllers/user';
+import authMiddleware from '../common/auth_middleware';
 
 const router = Router();
 
@@ -25,7 +26,7 @@ const router = Router();
  *       500:
  *         description: Internal Server Error
  */
-router.post('/', createUser);
+router.post('/', authMiddleware, createUser);
 
 /**
  * @swagger
@@ -44,7 +45,7 @@ router.post('/', createUser);
  *       404:
  *         description: User not found
  */
-router.get('/:id', getUserById);
+router.get('/:id', authMiddleware, getUserById);
 
 /**
  * @swagger
@@ -71,7 +72,7 @@ router.get('/:id', getUserById);
  *       500:
  *         description: Internal Server Error
  */
-router.put('/:id', updateUser);
+router.put('/:id', authMiddleware, updateUser);
 
 /**
  * @swagger
@@ -92,6 +93,6 @@ router.put('/:id', updateUser);
  *       500:
  *         description: Internal Server Error
  */
-router.delete('/:id', deleteUser);
+router.delete('/:id', authMiddleware, deleteUser);
 
 export default router;
