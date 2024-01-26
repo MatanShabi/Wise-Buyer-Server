@@ -3,7 +3,10 @@ import PostModel, { IPost } from '../models/post';
 
 export const getAllPosts = async (req: Request, res: Response) => {
   try {
-    const posts = await PostModel.find();
+    const posts = await PostModel.find().populate({
+      path: 'user',
+      select: 'firstName lastName pictureUrl'
+    });
     res.json(posts);
   } catch (error) {
     res.status(500).json({ message: 'Internal Server Error' });

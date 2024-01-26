@@ -7,7 +7,7 @@ export interface IPost {
   link?: string;
   productUrl?: string;
   price: number;
-  userId?: ObjectId;
+  user?: ObjectId;
 }
 
 const postSchema = new mongoose.Schema<IPost>({
@@ -34,10 +34,11 @@ const postSchema = new mongoose.Schema<IPost>({
   productUrl: {
     type: String,
   },
-  userId: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
-});
+
+}, { timestamps: true });
 
 export default mongoose.model<IPost>("Post", postSchema);
