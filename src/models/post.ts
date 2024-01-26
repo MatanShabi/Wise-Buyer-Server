@@ -1,12 +1,13 @@
-import mongoose, {ObjectId} from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 
 export interface IPost {
   title: string;
   catalog: string;
   description: string;
   link?: string;
+  productUrl?: string;
   price: number;
-  owner?: ObjectId;
+  userId?: ObjectId;
 }
 
 const postSchema = new mongoose.Schema<IPost>({
@@ -30,11 +31,13 @@ const postSchema = new mongoose.Schema<IPost>({
     type: Number,
     required: true,
   },
-  owner: {
+  productUrl: {
+    type: String,
+  },
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User', 
-    required: false,
-  }
+    ref: 'User',
+  },
 });
 
 export default mongoose.model<IPost>("Post", postSchema);
