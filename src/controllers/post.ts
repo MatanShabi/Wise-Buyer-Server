@@ -5,7 +5,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
   try {
     const posts = await PostModel.find().populate({
       path: 'user',
-      select: 'firstName lastName pictureUrl'
+      select: '_id firstName lastName pictureUrl'
     });
     res.json(posts);
   } catch (error) {
@@ -31,7 +31,7 @@ export const createPost = async (req: Request, res: Response) => {
     const createdPost = await PostModel.create(newPost);
     const populatedPost = await PostModel.findById(createdPost._id).populate({
       path: 'user',
-      select: 'firstName lastName pictureUrl'
+      select: '_id firstName lastName pictureUrl'
     });
 
     res.status(201).json(populatedPost);
