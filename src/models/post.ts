@@ -5,7 +5,7 @@ export interface IPost {
   catalog: string;
   description: string;
   link?: string;
-  productUrl?: string;
+  pictureUrl?: string;
   price: number;
   user?: ObjectId;
 }
@@ -31,7 +31,7 @@ const postSchema = new mongoose.Schema<IPost>({
     type: Number,
     required: true,
   },
-  productUrl: {
+  pictureUrl: {
     type: String,
   },
   user: {

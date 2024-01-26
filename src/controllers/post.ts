@@ -29,7 +29,12 @@ export const createPost = async (req: Request, res: Response) => {
   try {
     const newPost: IPost = req.body;
     const createdPost = await PostModel.create(newPost);
-    res.status(201).json(createdPost);
+    const populatedPost = await PostModel.findById(createdPost._id).populate({
+      path: 'user',
+      select: 'firstName lastName pictureUrl'
+    });
+
+    res.status(201).json(populatedPost);
   } catch (error) {
     res.status(500).json({ message: 'Internal Server Error' });
   }
