@@ -2,6 +2,7 @@ import env from "dotenv";
 env.config();
 import express, { Express } from "express";
 import cors from 'cors'
+import logger from 'pino-http'
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import userRoute from "./routes/user";
@@ -18,6 +19,7 @@ const initApp = (): Promise<Express> => {
       const app = express();
       //TODO: when app is ready to production allow just the relevant domains.
       app.use(cors());
+      app.use(logger())
       app.use(bodyParser.json());
       app.use(bodyParser.urlencoded({ extended: true }));
       app.use("/user", userRoute);
