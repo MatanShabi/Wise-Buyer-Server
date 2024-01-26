@@ -1,14 +1,14 @@
-import express from 'express';
+import { Router } from 'express';
 import {
-  getAllPosts,
-  getPostById,
-  createPost,
-  updatePost,
-  deletePost,
+    getAllPosts,
+    getPostById,
+    createPost,
+    updatePost,
+    deletePost,
 } from '../controllers/post';
 import authMiddleware from '../common/auth_middleware';
 
-const router = express.Router();
+const router = Router();
 
 /**
  * @swagger
@@ -105,6 +105,6 @@ router.put('/:id', authMiddleware, updatePost);
  *       500:
  *         description: Internal Server Error
  */
-router.delete('/:id',authMiddleware, deletePost);
+router.delete('/:id', authMiddleware, deletePost);
 
 export default router;

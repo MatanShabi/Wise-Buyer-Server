@@ -1,4 +1,4 @@
-import express from 'express';
+import { Router } from 'express';
 import {
     createUser,
     getUserById,
@@ -7,7 +7,7 @@ import {
 } from '../controllers/user';
 import authMiddleware from '../common/auth_middleware';
 
-const router = express.Router();
+const router = Router();
 
 /**
  * @swagger
