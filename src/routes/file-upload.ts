@@ -6,7 +6,7 @@ const router = Router();
 
 const storage = multer.diskStorage({
     destination: (req: Request, file, cb) => {
-        let destination = 'public/';
+        let destination = 'public';
 
         if (req.query.destination) {
             destination += req.query.destination;
@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
         cb(null, destination);
     },
     filename: (req: Request, file, cb) => {
-        const ext = file.originalname.split('.').filter(Boolean).slice(1).join('.');
+        const ext = file.originalname.split('.').pop()
         cb(null, Date.now() + '.' + ext);
     },
 });
@@ -27,8 +27,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/', upload.single('file'), (req: Request, res: Response) => {
-    const port = process.env.NODE_ENV === 'production' ? process.env.HTTPS_PORT : process.env.PORT;
-    const fileUrl = `${req.protocol}://${req.get('host')}:${port}/${req.file?.path}`
+    const fileUrl = `${req.protocol}://${req.get('host')}/${req.file?.path}`
 
     res.status(200).send({ url: fileUrl });
 });

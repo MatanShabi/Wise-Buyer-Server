@@ -27,7 +27,7 @@ const initApp = (): Promise<Express> => {
       app.use("/post", postRoute);
       app.use("/auth", authRoute);
       app.use("/upload", fileUpload)
-      app.use('/public', express.static(__dirname + '/public'));
+      app.use('/public', express.static('public'));
 
       resolve(app);
     });
