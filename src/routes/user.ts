@@ -1,12 +1,12 @@
-import express from 'express';
+import { Router } from 'express';
 import {
-  createUser,
-  getUserById,
-  updateUser,
-  deleteUser,
+    createUser,
+    getUserById,
+    updateUser,
+    deleteUser,
 } from '../controllers/user';
 
-const router = express.Router();
+const router = Router();
 
 /**
  * @swagger
