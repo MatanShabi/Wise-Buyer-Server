@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { createDirectory, handleUserProfileImg} from '../common/rest_api_handler';
 
 const register = async (req: Request, res: Response) => {
     const {firstName, lastName, email, password} = req.body;
@@ -18,8 +19,14 @@ const register = async (req: Request, res: Response) => {
         const encryptedPassword = await bcrypt.hash(password, salt);
         const rs2 = await User.create({ 'email': email, 'password': encryptedPassword,
                                         'firstName': firstName, 'lastName': lastName});
+
+        const profileImgPath = `./public/profileImages/${rs2._id}`
+        createDirectory(profileImgPath);
+        await handleUserProfileImg(rs2._id, rs2.firstName, rs2.lastName, profileImgPath);
+
         return res.status(201).send(rs2);
     } catch (err) {
+        console.log(err);
         return res.status(400).send("error missing email or password");
     }
 }
