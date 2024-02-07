@@ -13,6 +13,25 @@ export const getAllPosts = async (req: Request, res: Response) => {
   }
 };
 
+export const getPostsByUserId = async (req: Request, res: Response) => {
+  try {
+    const url = req.url;
+    const startIndex = url.lastIndexOf('/') + 1;
+    const userid = url.substring(startIndex);
+
+    const posts = await PostModel.find({ user: userid }).populate({
+      path: 'user',
+      select: '_id firstName lastName pictureUrl'
+    });
+    if (!posts) {
+      return res.status(404).json({ message: 'Posts not found' });
+    }
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 export const getPostById = async (req: Request, res: Response) => {
   try {
     const post = await PostModel.findById(req.params.id);
@@ -24,6 +43,7 @@ export const getPostById = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 
 export const createPost = async (req: Request, res: Response) => {
   try {
