@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
     getAllPosts,
     getPostById,
+    getPostsByUserId,
     createPost,
     updatePost,
     deletePost,
@@ -38,6 +39,9 @@ router.get('/', authMiddleware, getAllPosts);
  *       404:
  *         description: Post not found
  */
+
+router.get('/user/:id', authMiddleware, getPostsByUserId);
+
 router.get('/:id', authMiddleware, getPostById);
 
 /**
