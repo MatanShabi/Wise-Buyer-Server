@@ -1,8 +1,65 @@
 import { Request, Response } from 'express';
-import User from '../models/user';
+import User, { IUser } from '../models/user';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { Document } from 'mongoose';
+import { OAuth2Client } from 'google-auth-library';
 import { createDirectory, handleUserProfileImg} from '../common/rest_api_handler';
+
+
+const client = new OAuth2Client();
+const googleSignin = async (req: Request, res: Response) => {
+    console.log(req.body);
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: req.body.credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        const email = payload?.email;
+        if (email != null) {
+            let user = await User.findOne({ 'email': email });
+            if (user == null) {
+                user = await User.create(
+                    {
+                        'email': email,
+                        'password': '0',
+                        'firstName': payload.given_name,
+                        'lastName': payload.family_name,
+                        'pictureUrl': payload?.picture
+                    });
+            }
+            const tokens = await generateTokens(user)
+            res.status(200).send({
+                _id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                pictureUrl: user.pictureUrl,
+                ...tokens
+            }
+            )
+        }
+    } catch (err) {
+        return res.status(400).send(err.message);
+    }
+
+}
+
+const generateTokens = async (user: Document & IUser) => {
+    const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
+    const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET);
+    if (user.refreshTokens == null) {
+        user.refreshTokens = [refreshToken];
+    } else {
+        user.refreshTokens.push(refreshToken);
+    }
+    await user.save();
+    return {
+        'accessToken': accessToken,
+        'refreshToken': refreshToken
+    };
+}
 
 const register = async (req: Request, res: Response) => {
     const {firstName, lastName, email, password} = req.body;
