@@ -43,7 +43,7 @@ export const createPost = async (req: Request, res: Response) => {
 export const updatePost = async (req: Request, res: Response) => {
   try {
     const updatedPost: IPost = req.body;
-    const post = await PostModel.findByIdAndUpdate(req.params.id, updatedPost, { new: true });
+    const post = await PostModel.findByIdAndUpdate(req.params.id, updatedPost);
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
