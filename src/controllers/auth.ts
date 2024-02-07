@@ -24,6 +24,11 @@ const register = async (req: Request, res: Response) => {
         createDirectory(profileImgPath);
         await handleUserProfileImg(rs2._id, rs2.firstName, rs2.lastName, profileImgPath);
 
+        const port = process.env.PORT;
+        
+        const fullProfileImgPath = `http://localhost:${port}/public/profileImages/${rs2._id}/profile.png`;
+        await User.findByIdAndUpdate(rs2._id, { $set: { 'pictureUrl': fullProfileImgPath } }, { new: true });
+
         return res.status(201).send(rs2);
     } catch (err) {
         console.log(err);
@@ -61,7 +66,8 @@ const login = async (req: Request, res: Response) => {
             firstName: user.firstName,
             lastName: user.lastName,
             'accessToken': accessToken,
-            'refreshToken': refreshToken
+            'refreshToken': refreshToken,
+            'pictureUrl': user.pictureUrl
         });
     } catch (err) {
         return res.status(400).send("error missing email or password");
