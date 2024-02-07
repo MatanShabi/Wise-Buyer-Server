@@ -130,3 +130,5 @@ dist
 .pnp.*
 
 openssl-secret.txt
+
+public/
