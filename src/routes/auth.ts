@@ -62,6 +62,7 @@ const router = Router();
 *               $ref: '#/components/schemas/User'
 */
 router.post("/register", authController.register);
+router.post("/google", authController.googleSignin);
 
 /**
 * @swagger
