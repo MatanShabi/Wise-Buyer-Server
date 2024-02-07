@@ -4,11 +4,10 @@ import fs from 'fs';
 // Function to create a directory
 export function createDirectory(directoryName: string) {
     fs.mkdirSync(directoryName, { recursive: true });
-
 }
 
 export async function handleUserProfileImg(userId: string, firstName: string, lastName: string, profileImgPath:string){
-    profileImgPath += "/profile.png"
+    profileImgPath += '/profile.png';
     return generateProfilePicture(`${firstName} ${lastName}`, profileImgPath);
 }
 
