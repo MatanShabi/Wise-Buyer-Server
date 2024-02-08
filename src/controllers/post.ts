@@ -34,7 +34,10 @@ export const getPostsByUserId = async (req: Request, res: Response) => {
 
 export const getPostById = async (req: Request, res: Response) => {
   try {
-    const post = await PostModel.findById(req.params.id);
+    const post = await PostModel.findById(req.params.id).populate({
+      path: 'user',
+      select: '_id firstName lastName pictureUrl'
+    });
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
