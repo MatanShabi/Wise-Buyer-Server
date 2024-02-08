@@ -81,9 +81,7 @@ const register = async (req: Request, res: Response) => {
         createDirectory(profileImgPath);
         await handleUserProfileImg(rs2._id, rs2.firstName, rs2.lastName, profileImgPath);
 
-        const port = process.env.PORT;
-        
-        const fullProfileImgPath = `http://localhost:${port}/public/profileImages/${rs2._id}/profile.png`;
+        const fullProfileImgPath = `${req.protocol}://${req.get('host')}/public/profileImages/${rs2._id}/profile.png`;
         await User.findByIdAndUpdate(rs2._id, { $set: { 'pictureUrl': fullProfileImgPath } }, { new: true });
 
         return res.status(201).send(rs2);
