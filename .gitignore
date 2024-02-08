@@ -132,3 +132,6 @@ dist
 openssl-secret.txt
 
 public/
+
+client-cert.pem
+client-key.pem
