@@ -17,6 +17,7 @@ const googleSignin = async (req: Request, res: Response) => {
         });
         const payload = ticket.getPayload();
         const email = payload?.email;
+        const now = new Date();
         if (email != null) {
             let user = await User.findOne({ 'email': email });
             if (user == null) {
@@ -36,6 +37,8 @@ const googleSignin = async (req: Request, res: Response) => {
                 firstName: user.firstName,
                 lastName: user.lastName,
                 pictureUrl: user.pictureUrl,
+                refreshTokenInterval: 3000,
+                loginTime: now.getTime(),
                 ...tokens
             }
             )
@@ -48,7 +51,7 @@ const googleSignin = async (req: Request, res: Response) => {
 
 const generateTokens = async (user: Document & IUser) => {
     const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-    const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET);
+    const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET,{expiresIn: process.env.JWT_REFRESH_EXPIRATION});
     if (user.refreshTokens == null) {
         user.refreshTokens = [refreshToken];
     } else {
@@ -106,9 +109,9 @@ const login = async (req: Request, res: Response) => {
         if (!match) {
             return res.status(401).send("email or password incorrect");
         }
-
+        const now = new Date();
         const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-        const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET);
+        const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRATION});
         if (user.refreshTokens == null) {
             user.refreshTokens = [refreshToken];
         } else {
@@ -120,9 +123,11 @@ const login = async (req: Request, res: Response) => {
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            'accessToken': accessToken,
-            'refreshToken': refreshToken,
-            'pictureUrl': user.pictureUrl
+            refreshTokenInterval: 3000,
+            loginTime: now.getTime(),
+            accessToken,
+            refreshToken,
+            pictureUrl: user.pictureUrl
         });
     } catch (err) {
         return res.status(400).send("error missing email or password");
@@ -131,9 +136,10 @@ const login = async (req: Request, res: Response) => {
 
 const logout = async (req: Request, res: Response) => {
     const authHeader = req.headers['authorization'];
-    const refreshToken = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+    const refreshToken = authHeader && authHeader.split(' ')[1];
     if (refreshToken == null) return res.sendStatus(401);
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
+
+    jwt.verify(refreshToken, process.env.JWT_SECRET, async (err, user: { '_id': string }) => {
         console.log(err);
         if (err) return res.sendStatus(401);
         try {
@@ -154,10 +160,10 @@ const logout = async (req: Request, res: Response) => {
 }
 
 const refresh = async (req: Request, res: Response) => {
-    const authHeader = req.headers['authorization'];
-    const refreshToken = authHeader && authHeader.split(' ')[1]; // Bearer <token>
+    const authHeader =req.headers['authorization'];
+    const refreshToken = authHeader && authHeader.split(' ')[1];
     if (refreshToken == null) return res.sendStatus(401);
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
+    jwt.verify(refreshToken, process.env.JWT_SECRET, async (err, user: { '_id': string }) => {
         if (err) {
             console.log(err);
             return res.sendStatus(401);
@@ -170,13 +176,22 @@ const refresh = async (req: Request, res: Response) => {
                 return res.sendStatus(401);
             }
             const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-            const newRefreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET);
+            const newRefreshToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
             userDb.refreshTokens = userDb.refreshTokens.filter(t => t !== refreshToken);
-            userDb.refreshTokens.push(newRefreshToken);
+            userDb.refreshTokens.push(refreshToken);
             await userDb.save();
+
+            const now = new Date();
             return res.status(200).send({
-                'accessToken': accessToken,
-                'refreshToken': refreshToken
+                _id: user._id,
+                email: userDb.email,
+                firstName: userDb.firstName,
+                lastName: userDb.lastName,
+                refreshTokenInterval: 3000,
+                loginTime: now.getTime(),
+                accessToken,
+                newRefreshToken,
+                pictureUrl: userDb.pictureUrl
             });
         } catch (err) {
             res.sendStatus(401).send(err.message);
