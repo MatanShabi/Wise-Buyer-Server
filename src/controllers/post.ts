@@ -6,7 +6,7 @@ export const getAllPosts = async (req: Request, res: Response) => {
     const posts = await PostModel.find().populate({
       path: 'user',
       select: '_id firstName lastName pictureUrl'
-    });
+    }).sort({ createdAt: -1 });
     res.json(posts);
   } catch (error) {
     res.status(500).json({ message: 'Internal Server Error' });
