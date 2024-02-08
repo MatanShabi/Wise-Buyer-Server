@@ -51,7 +51,7 @@ const googleSignin = async (req: Request, res: Response) => {
 
 const generateTokens = async (user: Document & IUser) => {
     const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-    const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET,{expiresIn: process.env.JWT_REFRESH_EXPIRATION});
+    const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRATION});
     if (user.refreshTokens == null) {
         user.refreshTokens = [refreshToken];
     } else {
@@ -73,7 +73,7 @@ const register = async (req: Request, res: Response) => {
     try {
         const rs = await User.findOne({ 'email': email });
         if (rs != null) {
-            return res.status(406).send("email already exists");
+            return res.status(406).send('email already exists');
         }
         const salt = await bcrypt.genSalt(10);
         const encryptedPassword = await bcrypt.hash(password, salt);
@@ -111,7 +111,7 @@ const login = async (req: Request, res: Response) => {
         }
         const now = new Date();
         const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-        const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRATION});
+        const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRATION});
         if (user.refreshTokens == null) {
             user.refreshTokens = [refreshToken];
         } else {
@@ -163,7 +163,7 @@ const refresh = async (req: Request, res: Response) => {
     const authHeader =req.headers['authorization'];
     const refreshToken = authHeader && authHeader.split(' ')[1];
     if (refreshToken == null) return res.sendStatus(401);
-    jwt.verify(refreshToken, process.env.JWT_SECRET, async (err, user: { '_id': string }) => {
+    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
         if (err) {
             console.log(err);
             return res.sendStatus(401);
@@ -176,7 +176,7 @@ const refresh = async (req: Request, res: Response) => {
                 return res.sendStatus(401);
             }
             const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-            const newRefreshToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+            const newRefreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET,  { expiresIn: process.env.JWT_REFRESH_EXPIRATION });
             userDb.refreshTokens = userDb.refreshTokens.filter(t => t !== refreshToken);
             userDb.refreshTokens.push(refreshToken);
             await userDb.save();
@@ -190,7 +190,7 @@ const refresh = async (req: Request, res: Response) => {
                 refreshTokenInterval: +process.env.JWT_REFRESH_INTERVAL,
                 loginTime: now.getTime(),
                 accessToken,
-                newRefreshToken,
+                refreshToken: newRefreshToken,
                 pictureUrl: userDb.pictureUrl
             });
         } catch (err) {
