@@ -128,3 +128,10 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+openssl-secret.txt
+
+public/
+
+client-cert.pem
+client-key.pem
