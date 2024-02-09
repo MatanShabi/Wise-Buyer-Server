@@ -23,7 +23,7 @@ export const getPostsByUserId = async (req: Request, res: Response) => {
       path: 'user',
       select: '_id firstName lastName pictureUrl'
     });
-    if (!posts) {
+    if (!posts || posts.length === 0) {
       return res.status(404).json({ message: 'Posts not found' });
     }
     res.json(posts);

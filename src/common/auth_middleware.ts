@@ -10,7 +10,6 @@ const authMiddleware = (req: AuthResquest, res: Response, next: NextFunction) =>
     if (token == null) return res.sendStatus(401);
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) {
-            console.log(err);
             return res.sendStatus(401);
         }
         req.user = user as { _id: string };
