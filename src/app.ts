@@ -19,7 +19,6 @@ const initApp = (): Promise<Express> => {
     const url = process.env.DB_URL;
     mongoose.connect(url!).then(() => {
       const app = express();
-      //TODO: when app is ready to production allow just the relevant domains.
       app.use(cors());
       app.use(logger())
       app.use(bodyParser.json());

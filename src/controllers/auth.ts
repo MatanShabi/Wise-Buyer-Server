@@ -140,11 +140,10 @@ const logout = async (req: Request, res: Response) => {
     if (refreshToken == null) return res.sendStatus(401);
 
     jwt.verify(refreshToken, process.env.JWT_SECRET, async (err, user: { '_id': string }) => {
-        console.log(err);
         if (err) return res.sendStatus(401);
         try {
             const userDb = await User.findOne({ '_id': user._id });
-            if (!userDb.refreshTokens || !userDb.refreshTokens.includes(refreshToken)) {
+            if (!userDb.refreshTokens) {
                 userDb.refreshTokens = [];
                 await userDb.save();
                 return res.sendStatus(401);
