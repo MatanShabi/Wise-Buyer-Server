@@ -11,9 +11,21 @@ const router = Router();
 
 /**
  * @swagger
+ * tags:
+ *   name: User
+ *   description: The User API
+ */
+
+
+/**
+ * @swagger
  * /:
  *   post:
  *     summary: Create a new user
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -33,6 +45,10 @@ router.post('/', authMiddleware, createUser);
  * /{id}:
  *   get:
  *     summary: Get a user by ID
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -52,6 +68,10 @@ router.get('/:id', authMiddleware, getUserById);
  * /{id}:
  *   put:
  *     summary: Update a user by ID
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -79,6 +99,10 @@ router.put('/:id', authMiddleware, updateUser);
  * /users/{id}:
  *   delete:
  *     summary: Delete a user by ID
+ *     tags:
+ *       - User
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

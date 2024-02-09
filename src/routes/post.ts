@@ -13,9 +13,20 @@ const router = Router();
 
 /**
  * @swagger
+ * tags:
+ *   name: Posts
+ *   description: The Posts API
+ */
+
+/**
+ * @swagger
  * /posts:
  *   get:
  *     summary: Get all posts
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Returns the list of posts
@@ -27,6 +38,10 @@ router.get('/', authMiddleware, getAllPosts);
  * /posts/{id}:
  *   get:
  *     summary: Get a post by ID
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -39,16 +54,40 @@ router.get('/', authMiddleware, getAllPosts);
  *       404:
  *         description: Post not found
  */
-
-router.get('/user/:id', authMiddleware, getPostsByUserId);
-
 router.get('/:id', authMiddleware, getPostById);
+
+/**
+ * @swagger
+ * /posts/user/{id}:
+ *   get:
+ *     summary: Get posts by user ID
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Returns the posts for the specified user ID
+ *       404:
+ *         description: Posts not found
+ */
+router.get('/user/:id', authMiddleware, getPostsByUserId);
 
 /**
  * @swagger
  * /posts:
  *   post:
  *     summary: Create a new post
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -68,6 +107,10 @@ router.post('/', authMiddleware, createPost);
  * /posts/{id}:
  *   put:
  *     summary: Update a post by ID
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -95,6 +138,10 @@ router.put('/:id', authMiddleware, updatePost);
  * /posts/{id}:
  *   delete:
  *     summary: Delete a post by ID
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
