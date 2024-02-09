@@ -20,6 +20,7 @@ const router = Router();
  *       bearerFormat: JWT
  */
 
+
 /**
  * @swagger
  * components:
@@ -29,6 +30,8 @@ const router = Router();
  *       required:
  *         - email
  *         - password
+ *         - firstName
+ *         - lastName
  *       properties:
  *         email:
  *           type: string
@@ -36,9 +39,17 @@ const router = Router();
  *         password:
  *           type: string
  *           description: The user password
+ *         firstName:
+ *           type: string
+ *           description: The user's first name
+ *         lastName:
+ *           type: string
+ *           description: The user's last name
  *       example:
  *         email: 'bob@gmail.com'
  *         password: '123456'
+ *         firstName: 'Bob'
+ *         lastName: 'Doe'
  */
 
 /**
