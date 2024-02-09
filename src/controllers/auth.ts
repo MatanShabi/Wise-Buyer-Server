@@ -9,7 +9,6 @@ import { createDirectory, handleUserProfileImg} from '../common/rest_api_handler
 
 const client = new OAuth2Client();
 const googleSignin = async (req: Request, res: Response) => {
-    console.log(req.body);
     try {
         const ticket = await client.verifyIdToken({
             idToken: req.body.credential,
@@ -20,6 +19,16 @@ const googleSignin = async (req: Request, res: Response) => {
         const now = new Date();
         if (email != null) {
             let user = await User.findOne({ 'email': email });
+
+            const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
+            const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRATION});
+
+            if (user.refreshTokens == null) {
+                user.refreshTokens = [refreshToken];
+            } else {
+                user.refreshTokens.push(refreshToken);
+            }
+
             if (user == null) {
                 user = await User.create(
                     {
@@ -27,10 +36,10 @@ const googleSignin = async (req: Request, res: Response) => {
                         'password': '0',
                         'firstName': payload.given_name,
                         'lastName': payload.family_name,
-                        'pictureUrl': payload?.picture
+                        'pictureUrl': payload?.picture,
                     });
             }
-            const tokens = await generateTokens(user)
+
             res.status(200).send({
                 _id: user._id,
                 email: user.email,
@@ -39,7 +48,8 @@ const googleSignin = async (req: Request, res: Response) => {
                 pictureUrl: user.pictureUrl,
                 refreshTokenInterval: 3000,
                 loginTime: now.getTime(),
-                ...tokens
+                accessToken,
+                refreshToken
             }
             )
         }
@@ -49,28 +59,14 @@ const googleSignin = async (req: Request, res: Response) => {
 
 }
 
-const generateTokens = async (user: Document & IUser) => {
-    const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
-    const refreshToken = jwt.sign({ _id: user._id }, process.env.JWT_REFRESH_SECRET, {expiresIn: process.env.JWT_REFRESH_EXPIRATION});
-    if (user.refreshTokens == null) {
-        user.refreshTokens = [refreshToken];
-    } else {
-        user.refreshTokens.push(refreshToken);
-    }
-    await user.save();
-    return {
-        'accessToken': accessToken,
-        'refreshToken': refreshToken
-    };
-}
-
 const register = async (req: Request, res: Response) => {
-    const {firstName, lastName, email, password} = req.body;
-
-    if (!email || !password || !firstName || !lastName) {
-        return res.status(400).send("missing parameters in body request");
-    }
     try {
+        const {firstName, lastName, email, password} = req.body;
+        
+        if (!email || !password || !firstName || !lastName) {
+            throw Error("missing parameters in body request");
+        }
+
         const rs = await User.findOne({ 'email': email });
         if (rs != null) {
             return res.status(406).send('email already exists');
@@ -89,18 +85,18 @@ const register = async (req: Request, res: Response) => {
 
         return res.status(201).send(rs2);
     } catch (err) {
-        console.log(err);
         return res.status(400).send("error missing email or password");
     }
 }
 
 const login = async (req: Request, res: Response) => {
+    try {
     const {email, password} = req.body;
     
     if (!email || !password) {
-        return res.status(400).send("missing email or password");
+        throw Error("missing email or password");
     }
-    try {
+    
         const user = await User.findOne({ 'email': email });
         if (user == null) {
             return res.status(401).send("email or password incorrect");
@@ -140,8 +136,12 @@ const logout = async (req: Request, res: Response) => {
     if (refreshToken == null) return res.sendStatus(401);
 
     jwt.verify(refreshToken, process.env.JWT_SECRET, async (err, user: { '_id': string }) => {
-        if (err) return res.sendStatus(401);
         try {
+            
+            if (err) {
+                throw Error('Failed to logging out')
+            }
+
             const userDb = await User.findOne({ '_id': user._id });
             if (!userDb.refreshTokens) {
                 userDb.refreshTokens = [];
@@ -153,7 +153,7 @@ const logout = async (req: Request, res: Response) => {
                 return res.sendStatus(200);
             }
         } catch (err) {
-            res.sendStatus(401).send(err.message);
+            return res.status(401).send(err.message);
         }
     });
 }
@@ -163,11 +163,12 @@ const refresh = async (req: Request, res: Response) => {
     const refreshToken = authHeader && authHeader.split(' ')[1];
     if (refreshToken == null) return res.sendStatus(401);
     jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, async (err, user: { '_id': string }) => {
-        if (err) {
-            console.log(err);
-            return res.sendStatus(401);
-        }
         try {
+
+            if (err) {
+                throw Error("Failed to refresh token")
+            }
+
             const userDb = await User.findOne({ '_id': user._id });
             if (!userDb.refreshTokens || !userDb.refreshTokens.includes(refreshToken)) {
                 userDb.refreshTokens = [];
@@ -193,7 +194,7 @@ const refresh = async (req: Request, res: Response) => {
                 pictureUrl: userDb.pictureUrl
             });
         } catch (err) {
-            res.sendStatus(401).send(err.message);
+            return res.status(401).send(err.message);
         }
     });
 }

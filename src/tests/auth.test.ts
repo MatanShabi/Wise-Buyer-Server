@@ -34,59 +34,72 @@ let accessToken: string;
 let refreshToken: string;
 let newRefreshToken: string;
 
-describe("Auth tests", () => {
+describe("Authorization tests", () => {
 
   test("Test Register", async () => {
-    const response = await request(app)
+    const registerResponse = await request(app)
       .post("/auth/register")
       .send(userRegister);
-    expect(response.statusCode).toBe(201);
+    expect(registerResponse.statusCode).toBe(201);
   });
 
   test("Test Register exist email", async () => {
-    const response = await request(app)
+    const registerResponse = await request(app)
       .post("/auth/register")
       .send(userRegister);
-    expect(response.statusCode).toBe(406);
+    expect(registerResponse.statusCode).toBe(406);
   });
 
   test("Test Register missing parameters in body request ", async () => {
-    const response = await request(app)
+    const registerResponse = await request(app)
       .post("/auth/register").send({
         email: "test@test.com",
         password: "1234567890",
       });
-    expect(response.statusCode).toBe(400);
+    expect(registerResponse.statusCode).toBe(400);
   });
 
   test("Test Login", async () => {
-    const response = await request(app)
+    const loginResponse = await request(app)
       .post("/auth/login").send(userLogin);
-    expect(response.statusCode).toBe(200);
-    user = response.body;
-    userId = response.body._id;
-    accessToken = response.body.accessToken;
-    refreshToken = response.body.refreshToken;
-    console.log("accessToken: " + accessToken);
-    console.log("refreshToken: " + refreshToken);
+    expect(loginResponse.statusCode).toBe(200);
+    user = loginResponse.body;
+    userId = loginResponse.body._id;
+    accessToken = loginResponse.body.accessToken;
+    refreshToken = loginResponse.body.refreshToken;
+    
     expect(accessToken).toBeDefined();
   });
 
   test('Test login with correct email and password', async () => {
-    const response = await request(app)
+    const loginResponse = await request(app)
       .post('/auth/login')
       .send(userLogin);
 
-    expect(response.statusCode).toBe(200);
-    expect(response.body.accessToken).toBeDefined();
-    expect(response.body.refreshToken).toBeDefined();
+    expect(loginResponse.statusCode).toBe(200);
+    expect(loginResponse.body.accessToken).toBeDefined();
+    expect(loginResponse.body.refreshToken).toBeDefined();
   });
 
-  // Add more test cases for login scenarios
+  test('Test login without email and password', async () => {
+    const loginResponse = await request(app)
+      .post('/auth/login')
+      .send();
+
+    expect(loginResponse.statusCode).toBe(400);
+  });
+
+  test('Test login without email that not exists', async () => {
+    const loginResponse = await request(app)
+      .post('/auth/login')
+      .send({email:"aaaaaaaa", password: "aaaaaa"});
+
+    expect(loginResponse.statusCode).toBe(401);
+  });
 
   test("Test forbidden access without token", async () => {
-    const response = await request(app).get(`/user/${userId}`);
-    expect(response.statusCode).toBe(401);
+    const userResponse = await request(app).get(`/user/${userId}`);
+    expect(userResponse.statusCode).toBe(401);
   });
 
   test("Test access with valid token", async () => {
@@ -96,46 +109,54 @@ describe("Auth tests", () => {
     expect(response.statusCode).toBe(200);
   });
 
-  // Add more test cases for access with token scenarios
-
-  // Define the sleep function
-  const sleep = async (ms: number) => {
-    return new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    });
-  };
 
   test("Test access after timeout of token", async () => {
-    const response = await request(app)
+    const loginResponse = await request(app)
       .post('/auth/login')
       .send(userLogin);
-    const accessToken = response.body.accessToken;
-    console.log("accessToken: " + accessToken);
+    const accessToken = loginResponse.body.accessToken;
+  
     await sleep(4000); 
-    const response2 = await request(app)
+
+    const userResponse = await request(app)
       .get(`/user/${userId}`)
       .set("Authorization", "Bearer " + accessToken);
-    expect(response2.statusCode).not.toBe(200);
+    expect(userResponse.statusCode).not.toBe(200);
   });
 
   test("Test refresh token", async () => {
-    const response = await request(app)
+    const refreshTokenResponse = await request(app)
       .get("/auth/refresh")
       .set("Authorization", "Bearer " + refreshToken);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.accessToken).toBeDefined();
-    expect(response.body.refreshToken).toBeDefined();
 
-    const newAccessToken = response.body.accessToken;
-    newRefreshToken = response.body.refreshToken;
+    expect(refreshTokenResponse.statusCode).toBe(200);
+    expect(refreshTokenResponse.body.accessToken).toBeDefined();
+    expect(refreshTokenResponse.body.refreshToken).toBeDefined();
 
-    const response2 = await request(app)
+    const newAccessToken = refreshTokenResponse.body.accessToken;
+    newRefreshToken = refreshTokenResponse.body.refreshToken;
+
+    const userResponse = await request(app)
       .get(`/user/${userId}`)
       .set("Authorization", "Bearer " + newAccessToken);
-    expect(response2.statusCode).toBe(200);
+    expect(userResponse.statusCode).toBe(200);
   });
 
-  // Add more test cases for refresh token scenarios
+
+  test("Test refresh token without token", async () => {
+    const refreshTokenResponse = await request(app)
+      .get("/auth/refresh")
+
+    expect(refreshTokenResponse.statusCode).toBe(401);
+  });
+
+  test("Test refresh token invalid token", async () => {
+    const refreshTokenResponse = await request(app)
+      .get("/auth/refresh")
+      .set("Authorization", "Bearer sakldjaklsjdklsajdljsalkd");
+
+    expect(refreshTokenResponse.statusCode).toBe(401);
+  });
 
   test("Test double use of refresh token", async () => {
     const response = await request(app)
@@ -150,19 +171,40 @@ describe("Auth tests", () => {
   });
 
   test("Test logout", async () => {
-    const response = await request(app)
+    const userLoginResponse = await request(app)
       .post("/auth/login").send(userLogin);
-    expect(response.statusCode).toBe(200);
-    user = response.body;
-    userId = response.body._id;
-    accessToken = response.body.accessToken;
-    refreshToken = response.body.refreshToken;
-    console.log("accessToken: " + accessToken);
-    console.log("refreshToken: " + refreshToken);
+    expect(userLoginResponse.statusCode).toBe(200);
+    user = userLoginResponse.body;
+    userId = userLoginResponse.body._id;
+    accessToken = userLoginResponse.body.accessToken;
+    refreshToken = userLoginResponse.body.refreshToken;
 
-    const response2 = await request(app)
+    const userLoggedOutResponse = await request(app)
       .get(`/auth/logout`)
       .set("Authorization", "Bearer " + accessToken);
-    expect(response2.statusCode).toBe(200);
+    expect(userLoggedOutResponse.statusCode).toBe(200);
   });
+
+  test("Test logout without token", async () => {
+    const userLoggedOutResponse = await request(app)
+      .get(`/auth/logout`)
+      
+    expect(userLoggedOutResponse.statusCode).toBe(401);
+  });
+
+  test("Test logout invalid token", async () => {
+    const userLoggedOutResponse = await request(app)
+      .get(`/auth/logout`)
+      .set("Authorization", "Bearer dkjsahdjksadkshakdhskjahdkjsahdkhsakdhjksa" );
+      
+    expect(userLoggedOutResponse.statusCode).toBe(401);
+  });
+
 });
+
+// Define the sleep function
+const sleep = async (ms: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+};
