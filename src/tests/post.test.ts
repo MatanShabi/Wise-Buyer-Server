@@ -26,7 +26,7 @@ const post1: IPost = {
 beforeAll(async () => {
   app = await initApp();
   console.log("beforeAll");
-  await Post.deleteMany();
+  await Post.deleteMany({'title': 'post1 title'});
 
   await User.deleteMany({ 'email': user.email });
   const response = await request(app)
@@ -63,7 +63,7 @@ describe("post tests", () => {
   });
 
   test("Test Post post", async () => {
-    addPost(post1);
+    await addPost(post1);
   });
 
   test("Test Get All posts with one post in DB", async () => {

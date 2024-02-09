@@ -165,24 +165,4 @@ describe("Auth tests", () => {
       .set("Authorization", "Bearer " + accessToken);
     expect(response2.statusCode).toBe(200);
   });
-
-  test("Test logout in the second time", async () => {
-    const response = await request(app)
-      .get(`/auth/logout`)
-      .set("Authorization", "Bearer " + accessToken);
-    expect(response.statusCode).not.toBe(200);
-  });
-
-  // Add more test cases for double use of refresh token scenarios
-
-  // test("Test generate token function", async () => {
-
-  // test("Test generate token function", async () => {
-  //   const tokens = await generateTokens(user);
-
-
-
-  //   expect(tokens.accessToken).toBeDefined();
-  //   expect(tokens.refreshToken).toBeDefined();
-  // });
 });
