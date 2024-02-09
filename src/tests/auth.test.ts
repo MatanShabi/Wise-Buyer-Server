@@ -111,14 +111,12 @@ describe("Auth tests", () => {
       .send(userLogin);
     const accessToken = response.body.accessToken;
     console.log("accessToken: " + accessToken);
-    await sleep(3500); 
+    await sleep(4000); 
     const response2 = await request(app)
       .get(`/user/${userId}`)
       .set("Authorization", "Bearer " + accessToken);
     expect(response2.statusCode).not.toBe(200);
   });
-
-  // Add more test cases for token timeout scenarios
 
   test("Test refresh token", async () => {
     const response = await request(app)
@@ -164,14 +162,14 @@ describe("Auth tests", () => {
 
     const response2 = await request(app)
       .get(`/auth/logout`)
-      .set("Authorization", "Bearer " + refreshToken);
+      .set("Authorization", "Bearer " + accessToken);
     expect(response2.statusCode).toBe(200);
   });
 
   test("Test logout in the second time", async () => {
     const response = await request(app)
       .get(`/auth/logout`)
-      .set("Authorization", "Bearer " + refreshToken);
+      .set("Authorization", "Bearer " + accessToken);
     expect(response.statusCode).not.toBe(200);
   });
 

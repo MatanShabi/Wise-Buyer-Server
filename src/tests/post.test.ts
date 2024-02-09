@@ -19,7 +19,8 @@ const post1: IPost = {
   title: "post1 title",
   catalog: "garden",
   description: "very good garden tool",
-  price: 100
+  price: 100,
+  commentsAmount: 0,
 };
 
 beforeAll(async () => {
